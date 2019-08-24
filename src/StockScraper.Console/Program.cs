@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace StockScraper
 {
-    class Program
+    public class Program
     {
-        static string[] companies = new string[]
+        private static string[] _companies = new string[]
         {
             "PLAYWAY",
             "Wirtualna",
@@ -32,8 +32,9 @@ namespace StockScraper
             "Orangepl"
         };
 
-        static readonly HttpClient client = new HttpClient();
-        static async Task Main(string[] args)
+        private static readonly HttpClient _client = new HttpClient();
+
+        public static async Task Main(string[] args)
         {
             DateTime.TryParse("2018-01-03", out DateTime start);
             DateTime.TryParse("2018-03-29", out DateTime end);
@@ -43,17 +44,16 @@ namespace StockScraper
                   .ToArray();
 
             var workdays = dates
-                    .Where(x => x.Date.DayOfWeek != DayOfWeek.Saturday ||
+                    .Where(x => x.Date.DayOfWeek != DayOfWeek.Saturday &&
                                 x.Date.DayOfWeek != DayOfWeek.Sunday)
                     .ToArray();
 
-            foreach (var company in companies)
+            foreach (var company in _companies)
             {
                 Console.WriteLine("result for: {0}", company);
                 try
                 {
-
-                    HttpResponseMessage response = await client.GetAsync(
+                    HttpResponseMessage response = await _client.GetAsync(
                         $"https://www.bankier.pl/new-charts/get-data?" +
                         $"date_from=1514934000000&" +
                         $"date_to=1522360799000&" +
@@ -66,10 +66,13 @@ namespace StockScraper
 
                     using (var writer = new StreamWriter($"../files/{company}.csv"))
                     {
-                        foreach (var item in data.Main)
+                        for (int i = 0; i < workdays.Length; i++)
                         {
-                            Console.WriteLine($"time: {item[0]}, value: {item[1]}");
-                            var line = string.Format("{0},{1}", item[0], item[1]);
+                            var day = workdays[i].ToShortDateString();
+                            var value = data.Main[i][1];
+
+                            Console.WriteLine($"time: {day}, value: {value}");
+                            var line = string.Format("{0},{1}", day, value);
                             writer.WriteLine(line);
                             writer.Flush();
                         }
