@@ -64,7 +64,7 @@ namespace StockScraper
                     response.EnsureSuccessStatusCode();
                     var data = Company.FromJson(await response.Content.ReadAsStringAsync());
 
-                    using (var writer = new StreamWriter($"{company}.csv"))
+                    using (var writer = new StreamWriter($"../files/{company}.csv"))
                     {
                         foreach (var item in data.Main)
                         {
