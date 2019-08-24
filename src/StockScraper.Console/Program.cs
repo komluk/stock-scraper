@@ -68,7 +68,7 @@ namespace StockScraper
                     {
                         for (int i = 0; i < workdays.Length; i++)
                         {
-                            var day = workdays[i].ToShortDateString();
+                            var day = workdays[i].ToString("MM/dd/yyyy");
                             var value = data.Main[i][1];
 
                             Console.WriteLine($"time: {day}, value: {value}");
